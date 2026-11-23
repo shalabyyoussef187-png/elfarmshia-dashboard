@@ -180,6 +180,7 @@ interface Brand {
 export interface ProductForm {
   name: string;
   price: string;
+  description: string;
   category: string;
   brand: string;
   isOffer: boolean;
@@ -674,6 +675,20 @@ export default function ProductModal({
             value={form.price ?? ""}
             onChange={(e) => onChange({ ...form, price: e.target.value })}
             className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all hover:border-gray-300"
+          />
+        </div>
+
+        {/* Description */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-gray-500 px-0.5">
+            الوصف (اختياري)
+          </label>
+          <textarea
+            placeholder="وصف المنتج..."
+            value={form.description}
+            onChange={(e) => onChange({ ...form, description: e.target.value })}
+            rows={3}
+            className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all hover:border-gray-300 resize-none leading-relaxed"
           />
         </div>
 

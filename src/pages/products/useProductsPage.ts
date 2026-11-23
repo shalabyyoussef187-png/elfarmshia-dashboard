@@ -12,6 +12,7 @@ export interface Product {
   id?: string;          // raw field returned by the API
   name: string;
   price: number;
+  description?: string;
   category: { _id: string; name: string } | string | null;
   brand: { _id: string; name: string } | string | null;
   image?: { url: string; fileId: string; thumbnailUrl: string };
@@ -57,6 +58,7 @@ export function useProductsPage() {
   const [form, setForm] = useState({
     name: "",
     price: "",
+    description: "",
     category: "",
     brand: "",
     isOffer: false,
@@ -185,6 +187,7 @@ export function useProductsPage() {
     setForm({
       name: "",
       price: "",
+      description: "",
       category: "",
       brand: "",
       isOffer: false,
@@ -203,6 +206,7 @@ export function useProductsPage() {
     setForm({
       name: p.name,
       price: String(p.price),
+      description: p.description ?? "",
       category: getName(p.category),
       brand: getName(p.brand),
       isOffer: p.isOffer ?? false,
@@ -228,6 +232,7 @@ export function useProductsPage() {
     const formData = new FormData();
     formData.append("name", form.name.trim());
     formData.append("price", String(Number(form.price)));
+    if (form.description) formData.append("description", form.description.trim());
     if (form.category) formData.append("category", form.category);
     if (form.brand) formData.append("brand", form.brand);
     if (imageFile) formData.append("image", imageFile);
