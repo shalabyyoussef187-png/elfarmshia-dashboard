@@ -13,9 +13,15 @@ export interface Product {
   name: string;
   price: number;
   description?: string;
+  features?: string;
+  usageInstructions?: string;
+  warnings?: string;
+  productInfo?: string;
   category: { _id: string; name: string } | string | null;
   brand: { _id: string; name: string } | string | null;
   image?: { url: string; fileId: string; thumbnailUrl: string };
+  image2?: { url: string; fileId: string; thumbnailUrl: string };
+  image3?: { url: string; fileId: string; thumbnailUrl: string };
   isOffer?: boolean;
   offerDiscountPercent?: number;
   offerDiscountAmount?: number;
@@ -59,6 +65,10 @@ export function useProductsPage() {
     name: "",
     price: "",
     description: "",
+    features: "",
+    usageInstructions: "",
+    warnings: "",
+    productInfo: "",
     category: "",
     brand: "",
     isOffer: false,
@@ -69,6 +79,8 @@ export function useProductsPage() {
     quantity: "",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFile2, setImageFile2] = useState<File | null>(null);
+  const [imageFile3, setImageFile3] = useState<File | null>(null);
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterBrand, setFilterBrand] = useState("");
@@ -143,11 +155,13 @@ export function useProductsPage() {
               ? currentPage + 1
               : currentPage;
       // Normalize: API returns `id`, map it to `_id` so all code uses one field
-      // Also map imageUrl, imageFileId, imageThumbnailUrl to image object
+      // Also map imageUrl/imageUrl2/imageUrl3 to image objects
       data = data.map((x: any) => ({
         ...x,
         _id: x._id || x.id || "",
-        image: x.image || (x.imageUrl ? { url: x.imageUrl, fileId: x.imageFileId, thumbnailUrl: x.imageThumbnailUrl } : undefined)
+        image:  x.image  || (x.imageUrl  ? { url: x.imageUrl,  fileId: x.imageFileId,  thumbnailUrl: x.imageThumbnailUrl  } : undefined),
+        image2: x.image2 || (x.imageUrl2 ? { url: x.imageUrl2, fileId: x.imageFileId2, thumbnailUrl: x.imageThumbnailUrl2 } : undefined),
+        image3: x.image3 || (x.imageUrl3 ? { url: x.imageUrl3, fileId: x.imageFileId3, thumbnailUrl: x.imageThumbnailUrl3 } : undefined),
       }));
 
       setProducts(data);
@@ -188,6 +202,10 @@ export function useProductsPage() {
       name: "",
       price: "",
       description: "",
+      features: "",
+      usageInstructions: "",
+      warnings: "",
+      productInfo: "",
       category: "",
       brand: "",
       isOffer: false,
@@ -198,6 +216,8 @@ export function useProductsPage() {
       quantity: "",
     });
     setImageFile(null);
+    setImageFile2(null);
+    setImageFile3(null);
     setShowModal(true);
   };
 
@@ -207,6 +227,10 @@ export function useProductsPage() {
       name: p.name,
       price: String(p.price),
       description: p.description ?? "",
+      features: p.features ?? "",
+      usageInstructions: p.usageInstructions ?? "",
+      warnings: p.warnings ?? "",
+      productInfo: p.productInfo ?? "",
       category: getName(p.category),
       brand: getName(p.brand),
       isOffer: p.isOffer ?? false,
@@ -217,6 +241,8 @@ export function useProductsPage() {
       quantity: String(p.quantity ?? ""),
     });
     setImageFile(null);
+    setImageFile2(null);
+    setImageFile3(null);
     setShowModal(true);
   };
 
@@ -233,9 +259,15 @@ export function useProductsPage() {
     formData.append("name", form.name.trim());
     formData.append("price", String(Number(form.price)));
     if (form.description) formData.append("description", form.description.trim());
+    if (form.features) formData.append("features", form.features.trim());
+    if (form.usageInstructions) formData.append("usageInstructions", form.usageInstructions.trim());
+    if (form.warnings) formData.append("warnings", form.warnings.trim());
+    if (form.productInfo) formData.append("productInfo", form.productInfo.trim());
     if (form.category) formData.append("category", form.category);
     if (form.brand) formData.append("brand", form.brand);
     if (imageFile) formData.append("image", imageFile);
+    if (imageFile2) formData.append("image2", imageFile2);
+    if (imageFile3) formData.append("image3", imageFile3);
 
     // Offer & BestSeller fields
     formData.append("isOffer", String(form.isOffer));
@@ -296,6 +328,24 @@ export function useProductsPage() {
     setFilterType("");
   };
 
+  const handleDeleteImage = async (id: string, slot: 1 | 2 | 3) => {
+    const ok = await toast.confirm({
+      title: `حذف الصورة ${slot === 1 ? "الرئيسية" : slot === 2 ? "الثانية" : "الثالثة"}؟`,
+      description: "سيتم إزالة الصورة نهائياً من المنتج.",
+      confirmLabel: "حذف",
+      cancelLabel: "إلغاء",
+    });
+    if (!ok) return;
+    try {
+      await api.delete(`/products/${id}/image?slot=${slot}`);
+      await fetchAll();
+      toast.success("تم حذف الصورة");
+    } catch (e) {
+      console.error(e);
+      toast.error("تعذر حذف الصورة", "تحقق من الاتصال أو حاول مرة أخرى.");
+    }
+  };
+
   const hasFilter = Boolean(
     filterCategory || filterBrand || search || filterType,
   );
@@ -315,6 +365,10 @@ export function useProductsPage() {
     setForm,
     imageFile,
     setImageFile,
+    imageFile2,
+    setImageFile2,
+    imageFile3,
+    setImageFile3,
     search,
     setSearch,
     filterCategory,
@@ -334,5 +388,6 @@ export function useProductsPage() {
     openEdit,
     handleSave,
     handleDelete,
+    handleDeleteImage,
   };
 }

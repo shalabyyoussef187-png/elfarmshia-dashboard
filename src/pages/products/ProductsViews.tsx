@@ -36,6 +36,8 @@ export interface ProductsViewsProps {
   form: ProductForm;
   setForm: Dispatch<SetStateAction<ProductForm>>;
   setImageFile: (f: File | null) => void;
+  setImageFile2: (f: File | null) => void;
+  setImageFile3: (f: File | null) => void;
   search: string;
   setSearch: (v: string) => void;
   filterCategory: string;
@@ -57,6 +59,7 @@ export interface ProductsViewsProps {
   openEdit: (p: Product) => void;
   handleSave: () => Promise<void>;
   handleDelete: (id: string) => Promise<void>;
+  handleDeleteImage: (id: string, slot: 1 | 2 | 3) => Promise<void>;
 }
 
 // ── Glassy card styles (injected once) ──────────────────────────────
@@ -404,6 +407,8 @@ export default function ProductsViews(p: ProductsViewsProps) {
     form,
     setForm,
     setImageFile,
+    setImageFile2,
+    setImageFile3,
     search,
     setSearch,
     filterCategory,
@@ -425,6 +430,7 @@ export default function ProductsViews(p: ProductsViewsProps) {
     openEdit,
     handleSave,
     handleDelete,
+    handleDeleteImage,
   } = p;
 
   return (
@@ -928,7 +934,12 @@ export default function ProductsViews(p: ProductsViewsProps) {
           onSave={handleSave}
           onClose={() => setShowModal(false)}
           currentImageUrl={editing?.image?.url}
+          currentImageUrl2={editing?.image2?.url}
+          currentImageUrl3={editing?.image3?.url}
           onImageChange={setImageFile}
+          onImageChange2={setImageFile2}
+          onImageChange3={setImageFile3}
+          onDeleteImage={(slot) => editing ? void handleDeleteImage(editing._id, slot) : undefined}
         />
       )}
     </>
